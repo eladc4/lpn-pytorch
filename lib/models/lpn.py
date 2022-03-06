@@ -19,7 +19,7 @@ class LPN(nn.Module):
         self.deconv_with_bias = extra.DECONV_WITH_BIAS
         self.attention = extra.get('ATTENTION')
 
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(64, momentum=BN_MOMENTUM)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)

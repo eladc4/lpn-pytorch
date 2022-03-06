@@ -7,7 +7,7 @@ DATA_DIR: ''
 GPUS: (0,)
 OUTPUT_DIR: 'output'
 LOG_DIR: 'log'
-WORKERS: 10
+WORKERS: 8 #10
 PRINT_FREQ: 100
 
 DATASET:
@@ -29,7 +29,7 @@ MODEL:
   - 48
   - 64
   SIGMA: 2
-  NUM_JOINTS: 17
+  NUM_JOINTS: 10
   TARGET_TYPE: 'gaussian'
   EXTRA:
     ATTENTION: 'GC'

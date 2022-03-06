@@ -22,16 +22,16 @@ import torch.utils.data
 import torch.utils.data.distributed
 import torchvision.transforms as transforms
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
+# sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
 
-from config import cfg
-from config import update_config
-from core.loss import JointsMSELoss
-from core.function import validate
-from utils.utils import create_logger, get_model_summary
+from lib.config import cfg
+from lib.config import update_config
+from lib.core.loss import JointsMSELoss
+from lib.core.function import validate
+from lib.utils.utils import create_logger, get_model_summary
 
-import dataset
-import models
+# import lib.dataset as dataset
+import lib.models as models
 
 
 def parse_args():
@@ -41,7 +41,7 @@ def parse_args():
                         help='experiment configure file name',
                         type=str,
                         # default="experiments/mpii/lpn/lpn50_256x256_gd256x2_gc.yaml")
-                        default="experiments/coco/lpn/lpn50_256x192_gd256x2_gc.yaml")
+                        default="lib/experiments/coco/lpn/lpn50_256x192_gd256x2_gc.yaml")
 
     # philly
     parser.add_argument('--modelDir',

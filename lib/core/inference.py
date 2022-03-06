@@ -18,7 +18,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from utils.transforms import transform_preds
+from lib.utils.transforms import transform_preds
 
 
 def get_max_preds(batch_heatmaps):
