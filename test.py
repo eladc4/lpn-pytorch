@@ -54,6 +54,15 @@ def parse_args():
                         type=str,
                         default='')
 
+    parser.add_argument('--comment',
+                        help='comment',
+                        nargs='+',
+                        type=str,
+                        default=None)
+
+    parser.add_argument('--neptune', action='store_true', default=False,
+                        help='Run neptune')
+
     args = parser.parse_args()
     return args
 

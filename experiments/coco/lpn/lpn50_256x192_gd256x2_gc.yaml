@@ -23,11 +23,11 @@ MODEL:
   NAME: 'lpn'
   PRETRAINED: ''
   IMAGE_SIZE:
-  - 192
-  - 256
+  - 384
+  - 384
   HEATMAP_SIZE:
-  - 48
-  - 64
+  - 96
+  - 96
   SIGMA: 2
   NUM_JOINTS: 10
   TARGET_TYPE: 'gaussian'
@@ -51,12 +51,13 @@ TRAIN:
   BEGIN_EPOCH: 0
   END_EPOCH: 150
   OPTIMIZER: 'adam'
-  LR: 0.001
+  LR: 0.00001
   LR_FACTOR: 0.1
   LR_STEP:
   - 90
   - 120
-  WD: 0.0001
+  - 250
+  WD: 0.00001
   GAMMA1: 0.99
   GAMMA2: 0.0
   MOMENTUM: 0.9
