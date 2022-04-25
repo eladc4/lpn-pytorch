@@ -279,7 +279,7 @@ class PoseHighResolutionNet(nn.Module):
         super(PoseHighResolutionNet, self).__init__()
 
         # stem net
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=2, padding=1,
+        self.conv1 = nn.Conv2d(1, 64, kernel_size=3, stride=2, padding=1,
                                bias=False)
         self.bn1 = nn.BatchNorm2d(64, momentum=BN_MOMENTUM)
         self.conv2 = nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=1,
