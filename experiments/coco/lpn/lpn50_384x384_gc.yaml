@@ -7,7 +7,7 @@ DATA_DIR: ''
 GPUS: (0,)
 OUTPUT_DIR: 'output'
 LOG_DIR: 'log'
-WORKERS: 8 #10
+WORKERS: 4 #10
 PRINT_FREQ: 100
 
 DATASET:
@@ -20,23 +20,23 @@ DATASET:
   ROT_FACTOR: 40
   SCALE_FACTOR: 0.3
   MAX_ANGLE: 10
-  SCALE_LIMITS: (0.7, 1.5)
+  SCALE_LIMITS: (0.7, 2.0)
   SQUASH_SHIFT: 10
-  CROP_RATIO: 1.5
-  VAL_CROP_RATIO: 1.2
+  CROP_RATIO: 1.7
+  VAL_CROP_RATIO: 1.5
   CUTOUT_PROB: 0.9
   CUTOUT_MIN: 20
   CUTOUT_MAX: 100
 MODEL:
   NAME: 'lpn'
-  PRETRAINED: ''
-  NUM_INPUT_IMAGES: 1
+  PRETRAINED: '/data/projects/swat/users/eladc/ordit_pose_est/pose_estimation_2d/single_person/deep-high-resolution-net.pytorch-master/lib/models/pytorch/pose_coco/lpn_50_256x192.pth'
+  NUM_INPUT_IMAGES: 3
   IMAGE_SIZE:
-  - 576
-  - 576
+  - 384
+  - 384
   HEATMAP_SIZE:
-  - 144
-  - 144
+  - 96
+  - 96
   SIGMA: 2
   NUM_JOINTS: 10
   JOINTS_WEIGHT: [5, 5, 1, 0.3, 1, 1, 1, 1, 1, 1]  # None

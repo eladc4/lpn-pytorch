@@ -19,7 +19,7 @@ class LPN(nn.Module):
         self.deconv_with_bias = extra.DECONV_WITH_BIAS
         self.attention = extra.get('ATTENTION')
 
-        self.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.conv1 = nn.Conv2d(cfg.MODEL.NUM_INPUT_IMAGES, 64, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(64, momentum=BN_MOMENTUM)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
@@ -108,6 +108,7 @@ class LPN(nn.Module):
 
         features = self.deconv_layers(x)
         x = self.final_layer(features)
+        # x = torch.sigmoid(x)
 
         return x
 
@@ -136,6 +137,9 @@ class LPN(nn.Module):
                     nn.init.constant_(m.bias, 0)
 
             pretrained_state_dict = torch.load(pretrained)
+            pretrained_state_dict.pop('final_layer.weight')
+            pretrained_state_dict.pop('final_layer.bias')
+
             logger.info('=> loading pretrained model {}'.format(pretrained))
             self.load_state_dict(pretrained_state_dict, strict=False)
         else:

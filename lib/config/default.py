@@ -35,7 +35,9 @@ _C.MODEL = CN()
 _C.MODEL.NAME = 'pose_hrnet'
 _C.MODEL.INIT_WEIGHTS = True
 _C.MODEL.PRETRAINED = ''
+_C.MODEL.NUM_INPUT_IMAGES = 1
 _C.MODEL.NUM_JOINTS = 17
+_C.MODEL.JOINTS_WEIGHT = None
 _C.MODEL.TAG_PER_JOINT = True
 _C.MODEL.TARGET_TYPE = 'gaussian'
 _C.MODEL.IMAGE_SIZE = [256, 256]  # width * height, ex: 192 * 256
@@ -66,6 +68,14 @@ _C.DATASET.ROT_FACTOR = 30
 _C.DATASET.PROB_HALF_BODY = 0.0
 _C.DATASET.NUM_JOINTS_HALF_BODY = 8
 _C.DATASET.COLOR_RGB = False
+_C.DATASET.MAX_ANGLE = 60
+_C.DATASET.SCALE_LIMITS = (0.7, 2.0)
+_C.DATASET.SQUASH_SHIFT = 100
+_C.DATASET.CROP_RATIO = 1.7
+_C.DATASET.VAL_CROP_RATIO = 1.2
+_C.DATASET.CUTOUT_PROB = 0.9
+_C.DATASET.CUTOUT_MIN = 2
+_C.DATASET.CUTOUT_MAX = 100
 
 # train
 _C.TRAIN = CN()
@@ -135,6 +145,9 @@ def update_config(cfg, args):
 
     if args.logDir:
         cfg.LOG_DIR = args.logDir
+
+    if args.lr:
+        cfg.TRAIN.LR = args.lr
 
     # if args.dataDir:
     #     cfg.DATA_DIR = args.dataDir

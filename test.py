@@ -54,6 +54,11 @@ def parse_args():
                         type=str,
                         default='')
 
+    parser.add_argument('--lr',
+                        help='learning rate',
+                        type=float,
+                        default=None)
+
     parser.add_argument('--comment',
                         help='comment',
                         nargs='+',
