@@ -13,6 +13,8 @@ import logging
 
 import torch
 import torch.nn as nn
+from torchvision.transforms.functional import resize as torch_resize
+from torchvision.transforms.functional import InterpolationMode
 
 
 BN_MOMENTUM = 0.1
@@ -278,6 +280,10 @@ class PoseHighResolutionNet(nn.Module):
         extra = cfg.MODEL.EXTRA
         super(PoseHighResolutionNet, self).__init__()
 
+        self.input_size = cfg.MODEL.IMAGE_SIZE
+        self.num_joints = cfg.MODEL.NUM_JOINTS
+        self.resize_output = cfg.MODEL.RESIZE_OUTPUT
+        self.add_hm_channels = cfg.MODEL.USE_PREV_HM_INPUT
         # stem net
         self.conv1 = nn.Conv2d(cfg.MODEL.NUM_INPUT_IMAGES, 64, kernel_size=3, stride=2, padding=1,
                                bias=False)
@@ -286,7 +292,7 @@ class PoseHighResolutionNet(nn.Module):
                                bias=False)
         self.bn2 = nn.BatchNorm2d(64, momentum=BN_MOMENTUM)
         self.relu = nn.ReLU(inplace=True)
-        self.layer1 = self._make_layer(Bottleneck, 64, 4)
+        self.layer1 = self._make_layer(Bottleneck, 64, 4, add_hm_channels=self.add_hm_channels)
 
         self.stage2_cfg = cfg['MODEL']['EXTRA']['STAGE2']
         num_channels = self.stage2_cfg['NUM_CHANNELS']
@@ -320,13 +326,30 @@ class PoseHighResolutionNet(nn.Module):
         self.stage4, pre_stage_channels = self._make_stage(
             self.stage4_cfg, num_channels, multi_scale_output=False)
 
-        self.final_layer = nn.Conv2d(
-            in_channels=pre_stage_channels[0],
-            out_channels=cfg.MODEL.NUM_JOINTS,
-            kernel_size=extra.FINAL_CONV_KERNEL,
-            stride=1,
-            padding=1 if extra.FINAL_CONV_KERNEL == 3 else 0
-        )
+        if self.resize_output:
+            self.final_layer = nn.Conv2d(
+                in_channels=pre_stage_channels[0],
+                out_channels=cfg.MODEL.NUM_JOINTS*3,
+                kernel_size=extra.FINAL_CONV_KERNEL,
+                stride=1,
+                padding=1 if extra.FINAL_CONV_KERNEL == 3 else 0
+            )
+
+            self.resize_final_layer = nn.Conv2d(
+                in_channels=cfg.MODEL.NUM_JOINTS*3,
+                out_channels=cfg.MODEL.NUM_JOINTS,
+                kernel_size=5,
+                stride=1,
+                padding=2
+            )
+        else:
+            self.final_layer = nn.Conv2d(
+                in_channels=pre_stage_channels[0],
+                out_channels=cfg.MODEL.NUM_JOINTS,
+                kernel_size=extra.FINAL_CONV_KERNEL,
+                stride=1,
+                padding=1 if extra.FINAL_CONV_KERNEL == 3 else 0
+            )
 
         self.pretrained_layers = cfg['MODEL']['EXTRA']['PRETRAINED_LAYERS']
 
@@ -371,7 +394,7 @@ class PoseHighResolutionNet(nn.Module):
 
         return nn.ModuleList(transition_layers)
 
-    def _make_layer(self, block, planes, blocks, stride=1):
+    def _make_layer(self, block, planes, blocks, stride=1, add_hm_channels=False):
         downsample = None
         if stride != 1 or self.inplanes != planes * block.expansion:
             downsample = nn.Sequential(
@@ -382,7 +405,10 @@ class PoseHighResolutionNet(nn.Module):
                 nn.BatchNorm2d(planes * block.expansion, momentum=BN_MOMENTUM),
             )
 
-        layers = []
+        if add_hm_channels:
+            layers = [nn.Conv2d(in_channels=self.inplanes+self.num_joints, out_channels=self.inplanes, kernel_size=1)]
+        else:
+            layers = []
         layers.append(block(self.inplanes, planes, stride, downsample))
         self.inplanes = planes * block.expansion
         for i in range(1, blocks):
@@ -422,13 +448,15 @@ class PoseHighResolutionNet(nn.Module):
 
         return nn.Sequential(*modules), num_inchannels
 
-    def forward(self, x):
+    def forward(self, x, hm=None):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
         x = self.conv2(x)
         x = self.bn2(x)
         x = self.relu(x)
+        if hm is not None:
+            x = torch.cat([x, hm], dim=1)
         x = self.layer1(x)
 
         x_list = []
@@ -457,6 +485,9 @@ class PoseHighResolutionNet(nn.Module):
 
         x = self.final_layer(y_list[0])
 
+        if self.resize_output:
+            x = torch_resize(x, self.input_size, interpolation=InterpolationMode.BICUBIC)
+            x = self.resize_final_layer(x)
         return x
 
     def init_weights(self, pretrained=''):

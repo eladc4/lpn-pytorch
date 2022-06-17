@@ -36,12 +36,14 @@ _C.MODEL.NAME = 'pose_hrnet'
 _C.MODEL.INIT_WEIGHTS = True
 _C.MODEL.PRETRAINED = ''
 _C.MODEL.NUM_INPUT_IMAGES = 1
+_C.MODEL.USE_PREV_HM_INPUT = False
 _C.MODEL.NUM_JOINTS = 17
 _C.MODEL.JOINTS_WEIGHT = None
 _C.MODEL.TAG_PER_JOINT = True
 _C.MODEL.TARGET_TYPE = 'gaussian'
 _C.MODEL.IMAGE_SIZE = [256, 256]  # width * height, ex: 192 * 256
 _C.MODEL.HEATMAP_SIZE = [64, 64]  # width * height, ex: 24 * 32
+_C.MODEL.RESIZE_OUTPUT = False
 _C.MODEL.SIGMA = 2
 _C.MODEL.EXTRA = CN(new_allowed=True)
 
@@ -63,6 +65,7 @@ _C.DATASET.SELECT_DATA = False
 
 # training data augmentation
 _C.DATASET.FLIP = True
+_C.DATASET.FLIP_INDS = (0, 1, 2, 3, 4, 5, 7, 6, 9, 8)
 _C.DATASET.SCALE_FACTOR = 0.25
 _C.DATASET.ROT_FACTOR = 30
 _C.DATASET.PROB_HALF_BODY = 0.0
@@ -145,6 +148,12 @@ def update_config(cfg, args):
 
     if args.logDir:
         cfg.LOG_DIR = args.logDir
+
+    if args.workers:
+        cfg.WORKERS = args.workers
+
+    if args.batch_size:
+        cfg.TRAIN.BATCH_SIZE_PER_GPU = args.batch_size
 
     if args.lr:
         cfg.TRAIN.LR = args.lr

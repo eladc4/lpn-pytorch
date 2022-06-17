@@ -15,9 +15,10 @@ DATASET:
   DATASET: 'coco'
   DATA_FORMAT: jpg
   FLIP: true
+  FLIP_INDS: (0, 1, 2, 3, 4, 5, 7, 6, 9, 8, 10, 11, 12, 13, 14, 15, 17, 16, 19, 18)
   NUM_JOINTS_HALF_BODY: 8
   PROB_HALF_BODY: 0.3
-  ROOT: '/local_datasets/dataset_2d_new'
+  ROOT: 'data/coco/'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: 'val2017'
@@ -34,7 +35,8 @@ MODEL:
   INIT_WEIGHTS: false
   NAME: pose_hrnet
   NUM_JOINTS: 10
-  NUM_INPUT_IMAGES: 1
+  NUM_INPUT_IMAGES: 3
+  USE_PREV_HM_INPUT: true
   PRETRAINED: /data/projects/swat/users/eladc/ordit_pose_est/pose_estimation_2d/single_person/deep-high-resolution-net.pytorch-master/lib/models/pytorch/imagenet/hrnet_w48-8ef0771d.pth
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
@@ -43,9 +45,8 @@ MODEL:
   HEATMAP_SIZE:
   - 96
   - 96
-  RESIZE_OUTPUT: false
   SIGMA: 2
-  JOINTS_WEIGHT: [5, 5, 1, 0.3, 1, 1, 1, 1, 1, 1]  # None
+  JOINTS_WEIGHT: [5, 5, 1, 0.3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  # None
   EXTRA:
     PRETRAINED_LAYERS:
     - 'conv1'
@@ -60,6 +61,7 @@ MODEL:
     - 'transition3'
     - 'stage4'
     FINAL_CONV_KERNEL: 1
+    RESIZE_OUTPUT: false
     STAGE2:
       NUM_MODULES: 1
       NUM_BRANCHES: 2

@@ -7,32 +7,32 @@ DATA_DIR: ''
 GPUS: (0,)
 OUTPUT_DIR: 'output'
 LOG_DIR: 'log'
-WORKERS: 4
+WORKERS: 4 #10
 PRINT_FREQ: 100
 
 DATASET:
   COLOR_RGB: false
   DATASET: 'coco'
-  ROOT: '/local_datasets/dataset_2d_new'
+  ROOT: '/data/coco/'
   TEST_SET: 'val2017'
   TRAIN_SET: 'train2017'
   FLIP: true
-#  FLIP_INDS: (0, 1, 2, 3, 4, 5, 7, 6, 9, 8, 10, 11, 12, 13, 14, 15, 17, 16, 19, 18)
+  FLIP_INDS: (0, 1, 2, 3, 4, 5, 7, 6, 9, 8, 10, 11, 12, 13, 14, 15, 17, 16, 19, 18)
   ROT_FACTOR: 40
   SCALE_FACTOR: 0.3
   MAX_ANGLE: 10
-  SCALE_LIMITS: (0.8, 1.3)
-  SQUASH_SHIFT: 0
+  SCALE_LIMITS: (0.7, 2.0)
+  SQUASH_SHIFT: 10
   CROP_RATIO: 1.5
   VAL_CROP_RATIO: 1.7
-  CUTOUT_PROB: 0.0
-  CUTOUT_MIN: 10
-  CUTOUT_MAX: 10
+  CUTOUT_PROB: 0.9
+  CUTOUT_MIN: 20
+  CUTOUT_MAX: 100
 MODEL:
   NAME: 'lpn'
   PRETRAINED: '' #'/data/projects/swat/users/eladc/ordit_pose_est/pose_estimation_2d/single_person/deep-high-resolution-net.pytorch-master/lib/models/pytorch/pose_coco/lpn_50_256x192.pth'
-  NUM_INPUT_IMAGES: 1
-  USE_PREV_HM_INPUT: false
+  NUM_INPUT_IMAGES: 3
+  USE_PREV_HM_INPUT: true
   IMAGE_SIZE:
   - 384
   - 384
@@ -41,7 +41,7 @@ MODEL:
   - 96
   SIGMA: 2
   NUM_JOINTS: 10
-  JOINTS_WEIGHT: [5, 5, 1, 0.3, 1, 1, 1, 1, 1, 1]  # None
+  JOINTS_WEIGHT: [5, 5, 1, 0.3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  # None
   TARGET_TYPE: 'gaussian'
   EXTRA:
     ATTENTION: 'GC'

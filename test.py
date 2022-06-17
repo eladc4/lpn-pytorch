@@ -59,6 +59,16 @@ def parse_args():
                         type=float,
                         default=None)
 
+    parser.add_argument('--workers',
+                        help='num workers',
+                        type=int,
+                        default=None)
+
+    parser.add_argument('--batch_size',
+                        help='train batch size',
+                        type=int,
+                        default=None)
+
     parser.add_argument('--comment',
                         help='comment',
                         nargs='+',

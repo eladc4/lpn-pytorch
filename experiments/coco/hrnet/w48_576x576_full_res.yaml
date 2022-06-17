@@ -17,35 +17,35 @@ DATASET:
   FLIP: true
   NUM_JOINTS_HALF_BODY: 8
   PROB_HALF_BODY: 0.3
-  ROOT: '/local_datasets/dataset_2d_new'
+  ROOT: 'data/coco/'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: 'val2017'
   TRAIN_SET: 'train2017'
-  MAX_ANGLE: 30
+  MAX_ANGLE: 50
   SCALE_LIMITS: (0.7, 2.0)
-  SQUASH_SHIFT: 40
+  SQUASH_SHIFT: 60
   CROP_RATIO: 1.5
   VAL_CROP_RATIO: 1.7
   CUTOUT_PROB: 0.9
-  CUTOUT_MIN: 20
-  CUTOUT_MAX: 100
+  CUTOUT_MIN: 40
+  CUTOUT_MAX: 170
 MODEL:
   INIT_WEIGHTS: false
   NAME: pose_hrnet
   NUM_JOINTS: 10
-  NUM_INPUT_IMAGES: 1
-  PRETRAINED: /data/projects/swat/users/eladc/ordit_pose_est/pose_estimation_2d/single_person/deep-high-resolution-net.pytorch-master/lib/models/pytorch/imagenet/hrnet_w48-8ef0771d.pth
+  NUM_INPUT_IMAGES: 5
+  PRETRAINED: none #'models/pytorch/imagenet/hrnet_w48-8ef0771d.pth'
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
-  - 384
-  - 384
+  - 576
+  - 576
   HEATMAP_SIZE:
-  - 96
-  - 96
-  RESIZE_OUTPUT: false
+  - 576
+  - 576
+  RESIZE_OUTPUT: true
   SIGMA: 2
-  JOINTS_WEIGHT: [5, 5, 1, 0.3, 1, 1, 1, 1, 1, 1]  # None
+  JOINTS_WEIGHT: [5, 5, 3, 0.3, 1, 1, 1, 1, 1, 1]  # None
   EXTRA:
     PRETRAINED_LAYERS:
     - 'conv1'
@@ -102,17 +102,17 @@ MODEL:
 LOSS:
   USE_TARGET_WEIGHT: true
 TRAIN:
-  BATCH_SIZE_PER_GPU: 16
+  BATCH_SIZE_PER_GPU: 8
   SHUFFLE: true
   BEGIN_EPOCH: 0
   END_EPOCH: 300
   OPTIMIZER: adam
-  LR: 0.00001
+  LR: 0.0001
   LR_FACTOR: 0.1
   LR_STEP:
   - 100
+  - 170
   - 200
-  - 250
   WD: 0.0001
   GAMMA1: 0.99
   GAMMA2: 0.0
