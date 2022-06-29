@@ -36,6 +36,7 @@ _C.MODEL.NAME = 'pose_hrnet'
 _C.MODEL.INIT_WEIGHTS = True
 _C.MODEL.PRETRAINED = ''
 _C.MODEL.NUM_INPUT_IMAGES = 1
+_C.MODEL.NEW_MULTI_INPUT_MODE = False
 _C.MODEL.USE_PREV_HM_INPUT = False
 _C.MODEL.NUM_JOINTS = 17
 _C.MODEL.JOINTS_WEIGHT = None
@@ -45,6 +46,7 @@ _C.MODEL.IMAGE_SIZE = [256, 256]  # width * height, ex: 192 * 256
 _C.MODEL.HEATMAP_SIZE = [64, 64]  # width * height, ex: 24 * 32
 _C.MODEL.RESIZE_OUTPUT = False
 _C.MODEL.SIGMA = 2
+_C.MODEL.FINE_TUNE = False
 _C.MODEL.EXTRA = CN(new_allowed=True)
 
 _C.LOSS = CN()
@@ -149,7 +151,7 @@ def update_config(cfg, args):
     if args.logDir:
         cfg.LOG_DIR = args.logDir
 
-    if args.workers:
+    if args.workers is not None:
         cfg.WORKERS = args.workers
 
     if args.batch_size:

@@ -284,8 +284,12 @@ class PoseHighResolutionNet(nn.Module):
         self.num_joints = cfg.MODEL.NUM_JOINTS
         self.resize_output = cfg.MODEL.RESIZE_OUTPUT
         self.add_hm_channels = cfg.MODEL.USE_PREV_HM_INPUT
+        self.num_input_images = cfg.MODEL.NUM_INPUT_IMAGES
+        self.fine_tune = cfg.MODEL.FINE_TUNE
+        self.new_multi_input_mode = cfg.MODEL.NEW_MULTI_INPUT_MODE
         # stem net
-        self.conv1 = nn.Conv2d(cfg.MODEL.NUM_INPUT_IMAGES, 64, kernel_size=3, stride=2, padding=1,
+        num_input_images = 1 if self.new_multi_input_mode else self.num_input_images
+        self.conv1 = nn.Conv2d(num_input_images, 64, kernel_size=3, stride=2, padding=1,
                                bias=False)
         self.bn1 = nn.BatchNorm2d(64, momentum=BN_MOMENTUM)
         self.conv2 = nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=1,
@@ -350,6 +354,19 @@ class PoseHighResolutionNet(nn.Module):
                 stride=1,
                 padding=1 if extra.FINAL_CONV_KERNEL == 3 else 0
             )
+
+        if self.new_multi_input_mode and self.num_input_images > 1:
+            self.merge_heatmaps = nn.Sequential(nn.Conv2d(in_channels=cfg.MODEL.NUM_JOINTS * self.num_input_images,
+                                                          out_channels=cfg.MODEL.NUM_JOINTS * 3,
+                                                          kernel_size=5, stride=1, padding=2),
+                                                nn.BatchNorm2d(cfg.MODEL.NUM_JOINTS * 3),
+                                                nn.SiLU(),
+                                                nn.Conv2d(in_channels=cfg.MODEL.NUM_JOINTS * 3,
+                                                          out_channels=cfg.MODEL.NUM_JOINTS,
+                                                          kernel_size=3, stride=1, padding=1),
+                                                )
+        else:
+            self.merge_heatmaps = None
 
         self.pretrained_layers = cfg['MODEL']['EXTRA']['PRETRAINED_LAYERS']
 
@@ -448,7 +465,7 @@ class PoseHighResolutionNet(nn.Module):
 
         return nn.Sequential(*modules), num_inchannels
 
-    def forward(self, x, hm=None):
+    def backbone_forward(self, x, hm=None):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -484,11 +501,32 @@ class PoseHighResolutionNet(nn.Module):
         y_list = self.stage4(x_list)
 
         x = self.final_layer(y_list[0])
+        return x
+
+    def forward(self, x, hm=None, return_inter_hm=False):
+
+        if self.new_multi_input_mode and self.num_input_images > 1:
+            x = torch.reshape(x, [-1, 1] + self.input_size)
+        if self.fine_tune:
+            with torch.no_grad():
+                x = self.backbone_forward(x, hm=hm)
+        else:
+            x = self.backbone_forward(x, hm=hm)
+
+        if self.new_multi_input_mode and self.num_input_images > 1:
+            intermediate_heatmaps = torch.reshape(x, [-1, self.num_joints*self.num_input_images] + list(x.shape[2:]))
+            x = self.merge_heatmaps(intermediate_heatmaps)
+        else:
+            intermediate_heatmaps = None
 
         if self.resize_output:
             x = torch_resize(x, self.input_size, interpolation=InterpolationMode.BICUBIC)
             x = self.resize_final_layer(x)
-        return x
+
+        if return_inter_hm:
+            return x, intermediate_heatmaps
+        else:
+            return x
 
     def init_weights(self, pretrained=''):
         logger.info('=> init weights from normal distribution')
