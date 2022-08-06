@@ -17,26 +17,27 @@ DATASET:
   FLIP: true
   NUM_JOINTS_HALF_BODY: 8
   PROB_HALF_BODY: 0.3
-  ROOT: '/local_datasets/dataset_2d_new'
+  ROOT: '/data/projects/swat/users/eladc/project/dataset_2d_new'  # '/local_datasets/dataset_2d_new'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: 'val2017'
   TRAIN_SET: 'train2017'
-  MAX_ANGLE: 30
-  SCALE_LIMITS: (0.7, 2.0)
-  SQUASH_SHIFT: 40
+  MAX_ANGLE: 40
+  SCALE_LIMITS: (0.7, 2.5)
+  SQUASH_SHIFT: 60
   CROP_RATIO: 1.5
-  VAL_CROP_RATIO: 1.7
+  VAL_CROP_RATIO: 2.0
   CUTOUT_PROB: 0.9
-  CUTOUT_MIN: 20
+  CUTOUT_MIN: 40
   CUTOUT_MAX: 120
 MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet
   NUM_JOINTS: 10
   NUM_INPUT_IMAGES: 5
+  NEW_MULTI_INPUT_MODE: true
   FINE_TUNE: true
-  PRETRAINED: /data/projects/swat/results/eladc/fish_landmarks/20220616_000229__hrnet_384/state_dict.pth
+  PRETRAINED: /data/projects/swat/results/eladc/fish_landmarks/20220629_155129__hrnet_384_V100/state_dict.pth
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
   - 384
@@ -46,7 +47,7 @@ MODEL:
   - 96
   RESIZE_OUTPUT: false
   SIGMA: 2
-  JOINTS_WEIGHT: [5, 5, 1, 0.3, 1, 1, 1, 1, 1, 1]  # None
+  JOINTS_WEIGHT: [3, 3, 1, 0.3, 1, 1, 1, 1, 1, 1]  # None
   EXTRA:
     PRETRAINED_LAYERS:
     - 'conv1'
@@ -60,6 +61,7 @@ MODEL:
     - 'stage3'
     - 'transition3'
     - 'stage4'
+    - 'final_layer'
     FINAL_CONV_KERNEL: 1
     STAGE2:
       NUM_MODULES: 1
@@ -103,18 +105,18 @@ MODEL:
 LOSS:
   USE_TARGET_WEIGHT: true
 TRAIN:
-  BATCH_SIZE_PER_GPU: 4
+  BATCH_SIZE_PER_GPU: 16
   SHUFFLE: true
   BEGIN_EPOCH: 0
-  END_EPOCH: 300
+  END_EPOCH: 60
   OPTIMIZER: adam
-  LR: 0.00001
+  LR: 0.00005
   LR_FACTOR: 0.1
   LR_STEP:
-  - 100
-  - 200
-  - 250
-  WD: 0.0001
+  - 20
+  - 40
+  - 50
+  WD: 0.0000001
   GAMMA1: 0.99
   GAMMA2: 0.0
   MOMENTUM: 0.9

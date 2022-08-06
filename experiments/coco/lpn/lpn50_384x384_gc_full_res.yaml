@@ -13,21 +13,21 @@ PRINT_FREQ: 100
 DATASET:
   COLOR_RGB: false
   DATASET: 'coco'
-  ROOT: '/local_datasets/dataset_2d_new'
+  ROOT: '/data/projects/swat/users/eladc/project/dataset_2d_new'
   TEST_SET: 'val2017'
   TRAIN_SET: 'train2017'
   FLIP: true
 #  FLIP_INDS: (0, 1, 2, 3, 4, 5, 7, 6, 9, 8, 10, 11, 12, 13, 14, 15, 17, 16, 19, 18)
   ROT_FACTOR: 40
   SCALE_FACTOR: 0.3
-  MAX_ANGLE: 10
-  SCALE_LIMITS: (0.9, 2.0)
-  SQUASH_SHIFT: 10
+  MAX_ANGLE: 60
+  SCALE_LIMITS: (0.7, 2.0)
+  SQUASH_SHIFT: 70
   CROP_RATIO: 1.5
-  VAL_CROP_RATIO: 1.7
+  VAL_CROP_RATIO: 2.0
   CUTOUT_PROB: 0.9
-  CUTOUT_MIN: 20
-  CUTOUT_MAX: 100
+  CUTOUT_MIN: 60
+  CUTOUT_MAX: 140
 MODEL:
   NAME: 'lpn'
   PRETRAINED: '' #'/data/projects/swat/users/eladc/ordit_pose_est/pose_estimation_2d/single_person/deep-high-resolution-net.pytorch-master/lib/models/pytorch/pose_coco/lpn_50_256x192.pth'
@@ -40,7 +40,7 @@ MODEL:
   HEATMAP_SIZE:
   - 384
   - 384
-  SIGMA: 2
+  SIGMA: 4
   NUM_JOINTS: 10
   JOINTS_WEIGHT: [3, 3, 1, 0.3, 1, 1, 1, 1, 1, 1]  # None
   TARGET_TYPE: 'gaussian'
@@ -66,7 +66,7 @@ TRAIN:
   BATCH_SIZE_PER_GPU: 16
   SHUFFLE: true
   BEGIN_EPOCH: 0
-  END_EPOCH: 30
+  END_EPOCH: 240
   OPTIMIZER: 'adam'
 #  LR: 0.00001
   LR: 0.0002

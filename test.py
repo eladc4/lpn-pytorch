@@ -59,6 +59,21 @@ def parse_args():
                         type=float,
                         default=None)
 
+    parser.add_argument('--fl_gamma',
+                        help='Focal Loss gamma',
+                        type=float,
+                        default=0.5)
+
+    parser.add_argument('--focal_loss',
+                        help='Activate distance focal loss',
+                        action='store_true',
+                        default=False)
+
+    parser.add_argument('--fl_temp',
+                        help='Focal Loss temperature',
+                        type=float,
+                        default=1.0)
+
     parser.add_argument('--workers',
                         help='num workers',
                         type=int,

@@ -24,6 +24,7 @@ class LPN(nn.Module):
         self.fine_tune = cfg.MODEL.FINE_TUNE
         self.num_input_images = cfg.MODEL.NUM_INPUT_IMAGES
         self.new_multi_input_mode = cfg.MODEL.NEW_MULTI_INPUT_MODE
+        self.output_activation = cfg.MODEL.OUTPUT_ACTIVATION
 
         num_input_images = 1 if self.new_multi_input_mode else self.num_input_images
         self.conv1 = nn.Conv2d(num_input_images, 64, kernel_size=7, stride=2, padding=3, bias=False)
@@ -48,7 +49,7 @@ class LPN(nn.Module):
             out_channels=cfg.MODEL.NUM_JOINTS,
             kernel_size=extra.FINAL_CONV_KERNEL,
             stride=1,
-            padding=1 if extra.FINAL_CONV_KERNEL == 3 else 0
+            padding=int(extra.FINAL_CONV_KERNEL/2)
         )
 
         if self.new_multi_input_mode and self.num_input_images > 1:
@@ -63,7 +64,6 @@ class LPN(nn.Module):
                                                 )
         else:
             self.merge_heatmaps = None
-
 
     def _make_layer(self, block, planes, blocks, stride=1, add_hm_channels=False):
         downsample = None
@@ -134,7 +134,8 @@ class LPN(nn.Module):
 
         features = self.deconv_layers(x)
         x = self.final_layer(features)
-        # x = torch.sigmoid(x)
+        if self.output_activation is not None and self.output_activation.lower() == 'sigmoid':
+            x = torch.sigmoid(x)
         return x
 
     def forward(self, x, hm=None, return_inter_hm=False):
@@ -149,6 +150,8 @@ class LPN(nn.Module):
         if self.new_multi_input_mode and self.num_input_images > 1:
             intermediate_heatmaps = torch.reshape(x, [-1, self.num_joints*self.num_input_images] + list(x.shape[2:]))
             x = self.merge_heatmaps(intermediate_heatmaps)
+            if self.output_activation is not None and self.output_activation.lower() == 'sigmoid':
+                x = torch.sigmoid(x)
         else:
             intermediate_heatmaps = None
 
@@ -181,9 +184,10 @@ class LPN(nn.Module):
                     nn.init.normal_(m.weight, std=0.001)
                     nn.init.constant_(m.bias, 0)
 
-            pretrained_state_dict = torch.load(pretrained)
-            pretrained_state_dict.pop('final_layer.weight')
-            pretrained_state_dict.pop('final_layer.bias')
+            if False:#torch.cuda.is_available():
+                pretrained_state_dict = torch.load(pretrained)
+            else:
+                pretrained_state_dict = torch.load(pretrained, map_location = torch.device('cpu'))
 
             logger.info('=> loading pretrained model {}'.format(pretrained))
             self.load_state_dict(pretrained_state_dict, strict=False)

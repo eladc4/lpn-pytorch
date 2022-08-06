@@ -13,14 +13,22 @@ import torch.nn as nn
 
 
 class JointsMSELoss(nn.Module):
-    def __init__(self, use_target_weight):
+    def __init__(self, use_target_weight, gamma=0.5, focal_loss_enable=False, focal_temp=1.0):
         super(JointsMSELoss, self).__init__()
-        self.criterion = nn.MSELoss(reduction='mean')
+        if focal_loss_enable:
+            self.criterion = nn.MSELoss(reduction='none')
+        else:
+            self.criterion = nn.MSELoss(reduction='mean')
         self.use_target_weight = use_target_weight
+        self.gamma = gamma
+        self.focal_loss_enable = focal_loss_enable
+        self.softmax = torch.nn.Softmax(dim=0)
+        self.focal_temp = focal_temp
 
     def forward(self, output, target, target_weight):
         batch_size = output.size(0)
         num_joints = output.size(1)
+        H, W = output.size(2), output.size(3)
         heatmaps_pred = output.reshape((batch_size, num_joints, -1)).split(1, 1)
         heatmaps_gt = target.reshape((batch_size, num_joints, -1)).split(1, 1)
         loss = 0
@@ -28,13 +36,21 @@ class JointsMSELoss(nn.Module):
         for idx in range(num_joints):
             heatmap_pred = heatmaps_pred[idx].squeeze()
             heatmap_gt = heatmaps_gt[idx].squeeze()
+
             if self.use_target_weight:
-                loss += 0.5 * self.criterion(
-                    heatmap_pred.mul(target_weight[:, idx]),
-                    heatmap_gt.mul(target_weight[:, idx])
-                )
+                _loss = self.criterion(heatmap_pred.mul(target_weight[:, idx]),
+                                       heatmap_gt.mul(target_weight[:, idx]))
+                if self.focal_loss_enable:
+                    _max_ind = heatmap_gt.topk(1)[1]
+                    w_gt, h_gt = _max_ind % W, torch.floor(_max_ind / W).int()
+                    _max_ind = heatmap_pred.topk(1)[1]
+                    w, h = _max_ind % W, torch.floor(_max_ind / W).int()
+                    dist_weight = torch.pow(torch.square(w - w_gt) + torch.square(h - h_gt), self.gamma) / ((H+W)/2)
+                    dist_weight = self.softmax(dist_weight/self.focal_temp)
+                    _loss = torch.sum(_loss.mean(dim=1, keepdim=True) * dist_weight.detach())
             else:
-                loss += 0.5 * self.criterion(heatmap_pred, heatmap_gt)
+                _loss = self.criterion(heatmap_pred, heatmap_gt)
+            loss += 0.5 * _loss
 
         return loss / num_joints
 

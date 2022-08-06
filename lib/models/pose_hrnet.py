@@ -11,6 +11,7 @@ from __future__ import print_function
 import os
 import logging
 
+import numpy as np
 import torch
 import torch.nn as nn
 from torchvision.transforms.functional import resize as torch_resize
@@ -555,6 +556,19 @@ class PoseHighResolutionNet(nn.Module):
                 if name.split('.')[0] in self.pretrained_layers \
                    or self.pretrained_layers[0] == '*':
                     need_init_state_dict[name] = m
+            if self.new_multi_input_mode and self.num_input_images > 1:
+                conv_index = 0
+                cout, cin, H, W = tuple(self.merge_heatmaps[conv_index].weight.shape)
+                w = np.zeros((cout, cin, H, W))
+                for i in range(self.num_joints):
+                    w[i, int(self.num_input_images/2+0.5-1)*self.num_joints + i, int(H/2), int(W/2)] = 1
+                need_init_state_dict[f'merge_heatmaps.{conv_index}.weight'] = torch.Tensor(w)
+                conv_index = len(self.merge_heatmaps)-1
+                cout, cin, H, W = tuple(self.merge_heatmaps[conv_index].weight.shape)
+                w = np.zeros((cout, cin, H, W))
+                for i in range(self.num_joints):
+                    w[i, i, int(H/2), int(W/2)] = 1
+                need_init_state_dict[f'merge_heatmaps.{conv_index}.weight'] = torch.Tensor(w)
             self.load_state_dict(need_init_state_dict, strict=False)
         elif pretrained:
             logger.error('=> please download pre-trained models first!')

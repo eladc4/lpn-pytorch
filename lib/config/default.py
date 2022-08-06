@@ -47,6 +47,7 @@ _C.MODEL.HEATMAP_SIZE = [64, 64]  # width * height, ex: 24 * 32
 _C.MODEL.RESIZE_OUTPUT = False
 _C.MODEL.SIGMA = 2
 _C.MODEL.FINE_TUNE = False
+_C.MODEL.OUTPUT_ACTIVATION = None  # [None, 'sigmoid']
 _C.MODEL.EXTRA = CN(new_allowed=True)
 
 _C.LOSS = CN()
@@ -54,6 +55,9 @@ _C.LOSS.USE_OHKM = False
 _C.LOSS.TOPK = 8
 _C.LOSS.USE_TARGET_WEIGHT = True
 _C.LOSS.USE_DIFFERENT_JOINTS_WEIGHT = False
+_C.LOSS.FL_GAMMA = None
+_C.LOSS.USE_FOCAL_LOSS = False
+_C.LOSS.FOCAL_TEMP = 1.0
 
 # DATASET related params
 _C.DATASET = CN()
@@ -159,6 +163,15 @@ def update_config(cfg, args):
 
     if args.lr:
         cfg.TRAIN.LR = args.lr
+
+    if args.fl_gamma:
+        cfg.LOSS.FL_GAMMA = args.fl_gamma
+
+    if args.focal_loss:
+        cfg.LOSS.USE_FOCAL_LOSS = args.focal_loss
+
+    if args.fl_temp:
+        cfg.LOSS.FOCAL_TEMP = args.fl_temp
 
     # if args.dataDir:
     #     cfg.DATA_DIR = args.dataDir
