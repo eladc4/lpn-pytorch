@@ -184,10 +184,10 @@ class LPN(nn.Module):
                     nn.init.normal_(m.weight, std=0.001)
                     nn.init.constant_(m.bias, 0)
 
-            if False:#torch.cuda.is_available():
+            if torch.cuda.is_available():
                 pretrained_state_dict = torch.load(pretrained)
             else:
-                pretrained_state_dict = torch.load(pretrained, map_location = torch.device('cpu'))
+                pretrained_state_dict = torch.load(pretrained, map_location=torch.device('cpu'))
 
             logger.info('=> loading pretrained model {}'.format(pretrained))
             self.load_state_dict(pretrained_state_dict, strict=False)
