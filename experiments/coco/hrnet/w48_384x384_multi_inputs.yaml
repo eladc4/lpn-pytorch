@@ -17,7 +17,7 @@ DATASET:
   FLIP: true
   NUM_JOINTS_HALF_BODY: 8
   PROB_HALF_BODY: 0.3
-  ROOT: '/data/projects/swat/users/eladc/project/dataset_2d_new'  # '/local_datasets/dataset_2d_new'
+  ROOT: ''
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: 'val2017'
@@ -37,7 +37,7 @@ MODEL:
   NUM_INPUT_IMAGES: 5
   NEW_MULTI_INPUT_MODE: true
   FINE_TUNE: true
-  PRETRAINED: /data/projects/swat/results/eladc/fish_landmarks/20220629_155129__hrnet_384_V100/state_dict.pth
+  PRETRAINED: ''
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
   - 384

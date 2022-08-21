@@ -13,16 +13,16 @@ PRINT_FREQ: 100
 DATASET:
   COLOR_RGB: false
   DATASET: 'coco'
-  ROOT: '/data/projects/swat/users/eladc/project/dataset_2d_new'
+  ROOT: 'C:\project\dataset_2d_new'
   TEST_SET: 'val2017'
   TRAIN_SET: 'train2017'
   FLIP: true
 #  FLIP_INDS: (0, 1, 2, 3, 4, 5, 7, 6, 9, 8, 10, 11, 12, 13, 14, 15, 17, 16, 19, 18)
   ROT_FACTOR: 40
   SCALE_FACTOR: 0.3
-  MAX_ANGLE: 60
+  MAX_ANGLE: 10
   SCALE_LIMITS: (0.5, 2.3)
-  SQUASH_SHIFT: 70
+  SQUASH_SHIFT: 20
   CROP_RATIO: 1.5
   VAL_CROP_RATIO: 2.0
   CUTOUT_PROB: 0.7
@@ -30,7 +30,7 @@ DATASET:
   CUTOUT_MAX: 140
 MODEL:
   NAME: 'lpn'
-  PRETRAINED: '' #'/data/projects/swat/users/eladc/ordit_pose_est/pose_estimation_2d/single_person/deep-high-resolution-net.pytorch-master/lib/models/pytorch/pose_coco/lpn_50_256x192.pth'
+  PRETRAINED: ''
   NUM_INPUT_IMAGES: 1
   USE_PREV_HM_INPUT: false
 #  OUTPUT_ACTIVATION: 'sigmoid'

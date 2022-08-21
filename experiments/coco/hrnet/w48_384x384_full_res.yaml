@@ -35,7 +35,7 @@ MODEL:
   NAME: pose_hrnet
   NUM_JOINTS: 10
   NUM_INPUT_IMAGES: 1
-  PRETRAINED: /data/projects/swat/users/eladc/ordit_pose_est/pose_estimation_2d/single_person/deep-high-resolution-net.pytorch-master/lib/models/pytorch/imagenet/hrnet_w48-8ef0771d.pth
+  PRETRAINED: ""
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
   - 384
